@@ -55,6 +55,6 @@ resource "kubernetes_service" "example" {
       node_port   = 30010
     }
 
-    type = "NodePort"
+    type = "LoadBalancer"
   }
 }
