@@ -7,7 +7,7 @@ resource "kubernetes_deployment" "example" {
   }
 
   spec {
-    replicas = 1
+    replicas = 2
     selector {
       match_labels = {
         test = "MyExampleApp"
@@ -52,6 +52,7 @@ resource "kubernetes_service" "example" {
     port {
       port        = 80
       target_port = 80
+      node_port   = 30010
     }
 
     type = "LoadBalancer"

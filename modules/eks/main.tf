@@ -3,7 +3,8 @@ resource "aws_eks_cluster" "example" {
   role_arn = aws_iam_role.example.arn
 
   vpc_config {
-    subnet_ids = var.aws_public_subnet
+    subnet_ids             = var.aws_public_subnet
+    endpoint_public_access = true
   }
 
   # Ensure that IAM Role permissions are created before and deleted after EKS Cluster handling.
@@ -60,13 +61,13 @@ resource "aws_eks_node_group" "example" {
   }
 
   scaling_config {
-    desired_size = 2
+    desired_size = 1
     max_size     = 2
     min_size     = 1
   }
 
   update_config {
-    max_unavailable = 2
+    max_unavailable = 1
   }
 
   # Ensure that IAM Role permissions are created before and deleted after EKS Node Group handling.
