@@ -20,9 +20,6 @@ terraform {
 }
 
 
-data "aws_eks_cluster" "example" {
-  name = "example"
-}
 
 data "aws_eks_cluster_auth" "example" {
   name = "example"
@@ -30,7 +27,7 @@ data "aws_eks_cluster_auth" "example" {
 
 provider "kubernetes" {
   cluster_ca_certificate = base64decode(module.eks.kubeconfig-certificate-authority-data)
-  host                   = data.aws_eks_cluster.example.endpoint
+  host                   = module.eks.cluster_endpoint
   token                  = data.aws_eks_cluster_auth.example.token
 
 }
