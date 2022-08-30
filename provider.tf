@@ -18,11 +18,21 @@ terraform {
 
   required_version = "~> 1.2.0"
 }
+
+
+data "aws_eks_cluster" "example" {
+  name = "example"
+}
+
+data "aws_eks_cluster_auth" "example" {
+  name = "example"
+}
+
 provider "kubernetes" {
-  host                   = module.eks.cluster_endpoint
   cluster_ca_certificate = base64decode(module.eks.kubeconfig-certificate-authority-data)
-  # client_certificate     = file("~/.kube/client-cert.pem")
-  # client_key             = file("~/.kube/client-key.pem")
+  host                   = data.aws_eks_cluster.example.endpoint
+  token                  = data.aws_eks_cluster_auth.example.token
+  load_config_file       = false
 }
 
 provider "aws" {
