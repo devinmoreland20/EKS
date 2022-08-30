@@ -1,4 +1,3 @@
-
 terraform {
 
   required_providers {
@@ -27,9 +26,8 @@ provider "kubernetes" {
 }
 
 provider "aws" {
-  region = var.region
+  region = "us-east-2"
 }
-
 
 resource "random_string" "suffix" {
   length  = 8
