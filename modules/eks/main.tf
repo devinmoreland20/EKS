@@ -54,7 +54,7 @@ resource "aws_eks_node_group" "example" {
   node_group_name = "example"
   node_role_arn   = aws_iam_role.example2.arn
   subnet_ids      = var.aws_public_subnet
-  instance_types  = ["t2.micro"]
+  instance_types  = ["t3.small"]
   remote_access {
     source_security_group_ids = [aws_security_group.node_group_one.id]
     ec2_ssh_key               = "Ohio"
