@@ -32,7 +32,7 @@ provider "kubernetes" {
   cluster_ca_certificate = base64decode(module.eks.kubeconfig-certificate-authority-data)
   host                   = data.aws_eks_cluster.example.endpoint
   token                  = data.aws_eks_cluster_auth.example.token
-  load_config_file       = false
+
 }
 
 provider "aws" {
