@@ -14,4 +14,6 @@ output "cluster_endpoint" {
 output "cluster_name" {
   value = aws_eks_cluster.example.name
 }
-
+# output "cluster_ip" {
+#   value = aws_eks_node_group.example.
+# }
