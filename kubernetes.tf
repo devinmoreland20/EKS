@@ -1,8 +1,8 @@
-resource "kubernetes_deployment" "nginx" {
+resource "kubernetes_deployment" "example" {
   metadata {
-    name = "scalable-nginx-example"
+    name = "terraform-example"
     labels = {
-      App = "ScalableNginxExample"
+      test = "MyExampleApp"
     }
   }
 
@@ -10,23 +10,19 @@ resource "kubernetes_deployment" "nginx" {
     replicas = 2
     selector {
       match_labels = {
-        App = "ScalableNginxExample"
+        test = "MyExampleApp"
       }
     }
     template {
       metadata {
         labels = {
-          App = "ScalableNginxExample"
+          test = "MyExampleApp"
         }
       }
       spec {
         container {
           image = "nginx:1.7.8"
           name  = "example"
-
-          port {
-            container_port = 80
-          }
 
           resources {
             limits = {
@@ -41,5 +37,23 @@ resource "kubernetes_deployment" "nginx" {
         }
       }
     }
+  }
+}
+
+resource "kubernetes_service" "example" {
+  metadata {
+    name = "terraform-example"
+  }
+
+  spec {
+    selector = {
+      test = "myExampleApp"
+    }
+    port {
+      port        = 80
+      target_port = 80
+    }
+
+    type = "LoadBalancer"
   }
 }
