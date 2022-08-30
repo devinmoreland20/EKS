@@ -132,4 +132,13 @@ resource "aws_security_group" "node_group_one" {
       "0.0.0.0/0",
     ]
   }
+  ingress {
+    from_port = 30010
+    to_port   = 30010
+    protocol  = "tcp"
+
+    cidr_blocks = [
+      "0.0.0.0/0",
+    ]
+  }
 }
