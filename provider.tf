@@ -36,6 +36,6 @@ provider "aws" {
 }
 
 resource "random_string" "suffix" {
-  length  = 8
+  length  = 5
   special = false
 }

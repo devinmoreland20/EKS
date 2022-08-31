@@ -4,20 +4,65 @@ resource "aws_eks_cluster" "example" {
 
   vpc_config {
     subnet_ids              = var.aws_public_subnet
-    endpoint_public_access  = true
-    endpoint_private_access = false
-    public_access_cidrs     = ["0.0.0.0/0"]
+    endpoint_public_access  = var.endpoint_public_access
+    endpoint_private_access = var.endpoint_private_access
+    public_access_cidrs     = var.public_access_cidrs
     security_group_ids      = [aws_security_group.node_group_one.id]
   }
 
-
-  # Ensure that IAM Role permissions are created before and deleted after EKS Cluster handling.
-  # Otherwise, EKS will not be able to properly delete EKS managed EC2 infrastructure such as Security Groups.
   depends_on = [
     aws_iam_role_policy_attachment.example-AmazonEKSClusterPolicy,
     aws_iam_role_policy_attachment.example-AmazonEKSVPCResourceController,
   ]
 }
+
+resource "aws_eks_node_group" "example" {
+  cluster_name    = aws_eks_cluster.example.name
+  node_group_name = var.node_group_name
+  node_role_arn   = aws_iam_role.example2.arn
+  subnet_ids      = var.aws_public_subnet
+  instance_types  = var.instance_types
+
+  remote_access {
+    source_security_group_ids = [aws_security_group.node_group_one.id]
+    ec2_ssh_key               = var.key_pair
+  }
+
+  scaling_config {
+    desired_size = var.scaling_desired_size
+    max_size     = var.scaling_max_size
+    min_size     = var.scaling_min_size
+  }
+
+  depends_on = [
+    aws_iam_role_policy_attachment.example-AmazonEKSWorkerNodePolicy,
+    aws_iam_role_policy_attachment.example-AmazonEKS_CNI_Policy,
+    aws_iam_role_policy_attachment.example-AmazonEC2ContainerRegistryReadOnly,
+  ]
+}
+
+resource "aws_security_group" "node_group_one" {
+  name_prefix = "node_group_one"
+  vpc_id      = var.vpc_id
+
+  ingress {
+    from_port = 80
+    to_port   = 80
+    protocol  = "tcp"
+
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+}
+
+
+
+
 
 resource "aws_iam_role" "example" {
   name = "eks-cluster-example"
@@ -50,41 +95,6 @@ resource "aws_iam_role_policy_attachment" "example-AmazonEKSVPCResourceControlle
   role       = aws_iam_role.example.name
 }
 
-
-
-
-resource "aws_eks_node_group" "example" {
-  cluster_name    = aws_eks_cluster.example.name
-  node_group_name = "example"
-  node_role_arn   = aws_iam_role.example2.arn
-  subnet_ids      = var.aws_public_subnet
-  # instance_types  = ["t3.small"]
-
-  # remote_access {
-  #   source_security_group_ids = [aws_security_group.node_group_one.id]
-  #   ec2_ssh_key               = "Ohio"
-  # }
-
-  scaling_config {
-    desired_size = 1
-    max_size     = 1
-    min_size     = 1
-  }
-
-  # update_config {
-  #   max_unavailable = 0
-  # }
-
-  # Ensure that IAM Role permissions are created before and deleted after EKS Node Group handling.
-  # Otherwise, EKS will not be able to properly delete EC2 Instances and Elastic Network Interfaces.
-  depends_on = [
-    aws_iam_role_policy_attachment.example-AmazonEKSWorkerNodePolicy,
-    aws_iam_role_policy_attachment.example-AmazonEKS_CNI_Policy,
-    aws_iam_role_policy_attachment.example-AmazonEC2ContainerRegistryReadOnly,
-  ]
-}
-
-
 resource "aws_iam_role" "example2" {
   name = "eks-node-group-example"
 
@@ -115,37 +125,4 @@ resource "aws_iam_role_policy_attachment" "example-AmazonEC2ContainerRegistryRea
   role       = aws_iam_role.example2.name
 }
 
-resource "aws_security_group" "node_group_one" {
-  name_prefix = "node_group_one"
-  vpc_id      = var.vpc_id
 
-  ingress {
-    from_port = 443
-    to_port   = 443
-    protocol  = "tcp"
-
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-  # ingress {
-  #   from_port = 80
-  #   to_port   = 80
-  #   protocol  = "tcp"
-
-  #   cidr_blocks = ["0.0.0.0/0"]
-  # }
-  # ingress {
-  #   from_port = 30010
-  #   to_port   = 30010
-  #   protocol  = "tcp"
-
-  #   cidr_blocks = [
-  #     "0.0.0.0/0",
-  #   ]
-  # }
-  egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-}

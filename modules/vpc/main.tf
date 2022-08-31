@@ -1,8 +1,8 @@
 resource "aws_vpc" "project" {
   cidr_block       = var.vpc_cidr #our cidr is now a variable. 
-  instance_tenancy = "default"
+  instance_tenancy = var.instance_tenancy
   tags = {
-    Name = "Project"
+    Name = var.tags
   }
 }
 
@@ -10,7 +10,7 @@ resource "aws_internet_gateway" "project_gw" {
   vpc_id = aws_vpc.project.id
 
   tags = {
-    Name = "Project"
+    Name = var.tags
   }
 }
 data "aws_availability_zones" "available" {
@@ -27,9 +27,9 @@ resource "aws_subnet" "public_project_subnet" {
   vpc_id                  = aws_vpc.project.id
   cidr_block              = var.public_cidrs[count.index]
   availability_zone       = random_shuffle.az_list.result[count.index]
-  map_public_ip_on_launch = true
+  map_public_ip_on_launch = var.map_public_ip_on_launch
   tags = {
-    Name = "project public ${count.index}"
+    Name = var.tags
   }
 }
 
@@ -38,11 +38,11 @@ resource "aws_default_route_table" "internal_project_default" {
   default_route_table_id = aws_vpc.project.default_route_table_id
 
   route {
-    cidr_block = "0.0.0.0/0"
+    cidr_block = var.rt_route_cidr_block
     gateway_id = aws_internet_gateway.project_gw.id
   }
   tags = {
-    Name = "Project-internal-RT"
+    Name = var.tags
   }
 }
 
