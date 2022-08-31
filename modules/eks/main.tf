@@ -58,16 +58,16 @@ resource "aws_eks_node_group" "example" {
   node_group_name = "example"
   node_role_arn   = aws_iam_role.example2.arn
   subnet_ids      = var.aws_public_subnet
-  instance_types  = ["t3.small"]
+  # instance_types  = ["t3.small"]
 
-  remote_access {
-    source_security_group_ids = [aws_security_group.node_group_one.id]
-    ec2_ssh_key               = "Ohio"
-  }
+  # remote_access {
+  #   source_security_group_ids = [aws_security_group.node_group_one.id]
+  #   ec2_ssh_key               = "Ohio"
+  # }
 
   scaling_config {
     desired_size = 1
-    max_size     = 2
+    max_size     = 1
     min_size     = 1
   }
 
@@ -120,28 +120,28 @@ resource "aws_security_group" "node_group_one" {
   vpc_id      = var.vpc_id
 
   ingress {
-    from_port = 22
-    to_port   = 22
+    from_port = 443
+    to_port   = 443
     protocol  = "tcp"
 
     cidr_blocks = ["0.0.0.0/0"]
   }
-  ingress {
-    from_port = 80
-    to_port   = 80
-    protocol  = "tcp"
+  # ingress {
+  #   from_port = 80
+  #   to_port   = 80
+  #   protocol  = "tcp"
 
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-  ingress {
-    from_port = 30010
-    to_port   = 30010
-    protocol  = "tcp"
+  #   cidr_blocks = ["0.0.0.0/0"]
+  # }
+  # ingress {
+  #   from_port = 30010
+  #   to_port   = 30010
+  #   protocol  = "tcp"
 
-    cidr_blocks = [
-      "0.0.0.0/0",
-    ]
-  }
+  #   cidr_blocks = [
+  #     "0.0.0.0/0",
+  #   ]
+  # }
   egress {
     from_port   = 0
     to_port     = 0
